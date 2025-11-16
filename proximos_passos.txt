@@ -1,0 +1,27 @@
+- Consultar Assentos:
+    Vai conter duas opçoes:
+
+    - Opção Reservar Passagem:
+        Criar uma ou mais funçoes para permitir que o usuario possa, escolher a linha que deseja,
+        na data que preferir, para comprar.
+        Sugestao, imprimir o calendario ja feito, e poder selecionar naquela linha a data desejada, e assim 
+        atraves de uma "matriz" no terminal escolher a cadeira desejada para reservar.
+        #Nao pode:
+        * Reservar um assento ja reservado
+        * Reservar em uma linha que ja passou
+        * Reservar em um onibus cheio
+
+    - Opção Cancelar Passagem:
+        Basicamente igual ao anterior, mas ao inves de selecionar aquele que quer reservar, vai cancelar um assento ja reservado
+
+- Ler Reservas a partir de Arquivo de texto:
+    Seguir passsos do Pdf do trabalho, nada de muito diferente a principio
+
+- Gravar Reservas invalidas:
+    Seguir passsos do Pdf do trabalho, nada de muito diferente a principio
+
+- Relatorios/estatisticas:
+    - Permitir a geração dos relatórios (na tela ou em arquivo texto, escolha do usuário):
+    o Total arrecadado com venda de passagens no mês corrente para cada linha.
+    Ocupação percentual média de cada linha em cada dia da semana (uma matriz).
+    - Ideia, gerar grafico com matplotlib para comparar as receitas diarias de cada linha, e gerar um para ocupaçao percentual*
