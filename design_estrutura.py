@@ -1,6 +1,7 @@
 import estrutura as e
 from datetime import datetime, timedelta
 from desing_terminal import Cores as C
+import numpy as np
 
 
 def exibir_linha(linha_id, linha):
@@ -58,6 +59,64 @@ def mostrar_linhas():
 
     if not encontrou:
         print("Nenhuma linha cadastrada ainda.\n")
+
+
+def mostrar_horario_onibus(linha_id):
+    """Exibe os ônibus da linha em formato de calendário, mostrando assentos livres."""
+    if linha_id < 0 or linha_id >= len(e.linhas):
+        print(f"{C.VERMELHO}ID inexistente!{C.RESET}\n")
+        return
+
+    linha = e.linhas[linha_id]
+
+    if linha is None:
+        print(f"{C.VERMELHO}Esta linha foi removida e não possui ônibus cadastrados.{C.RESET}\n")
+        return
+
+    onibus_lista = e.onibus_por_linha.get(linha_id, [])
+
+    print("\n" + "="*60)
+    print(f"{C.AZUL}{C.NEGRITO}🗓️  ÔNIBUS DA LINHA {linha_id}{C.RESET}")
+    print("="*60)
+
+    if not onibus_lista:
+        print(f"{C.VERMELHO}Nenhum ônibus encontrado para essa linha.{C.RESET}\n")
+        return
+
+    print(f"\n{C.AMARELO}{C.NEGRITO}📅 Calendário de Horários:{C.RESET}")
+    print("-"*60)
+
+    linha_impressao = ""
+    count = 0
+
+    horario = linha['horario'][:5]  # dd/mm
+    livres = sum(onibus_lista[linha_id]["assentos"])
+
+        # Escolhendo cor com base no número de assentos livres
+    if livres == 20:
+        cor = C.VERDE
+    elif livres >= 10:
+        cor = C.AMARELO
+    else:
+        cor = C.VERMELHO
+
+    # Ex.: 16/11 (20)
+    linha_impressao += f"{cor}{horario}h ({livres}){C.RESET}".ljust(14)
+    count += 1
+
+    if count == 6:   # 6 datas por linha
+        print(linha_impressao)
+        linha = ""
+        count = 0
+
+    if linha:
+        print(linha_impressao)
+
+    print("-"*60)
+    print(f"{C.CIANO}Legenda:{C.RESET}")
+    print(f"{C.VERDE}(20){C.RESET} = todos os assentos livres")
+    print(f"{C.AMARELO}(10-19){C.RESET} = disponibilidade moderada")
+    print(f"{C.VERMELHO}(0-9){C.RESET} = poucos assentos\n")
 
 
 def mostrar_onibus_da_linha(linha_id):
@@ -118,3 +177,5 @@ def mostrar_onibus_da_linha(linha_id):
     print(f"{C.AMARELO}(10-19){C.RESET} = disponibilidade moderada")
     print(f"{C.VERMELHO}(0-9){C.RESET} = poucos assentos\n")
 
+def exibir_assentos(linha_id, matriz_assentos):
+   

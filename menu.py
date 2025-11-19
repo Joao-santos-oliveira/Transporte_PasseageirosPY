@@ -51,7 +51,8 @@ def menu():
         # OPÇÕES A IMPLEMENTAR    
 
         elif opc == "7":
-            print("\n Função 'Consultar assentos' ainda não implementada.\n")
+            #print("\n Função 'Consultar assentos' ainda não implementada.\n")
+            e.consultar_assentos()
 
         elif opc == "8":
             print("\n Função 'Ler Reservas a Partir de Arquivo de texto' ainda não implementada.\n")

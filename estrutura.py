@@ -1,5 +1,6 @@
 import design_estrutura as d 
 from datetime import datetime, timedelta
+import numpy as np
 
 linhas = []               # lista de linhas cadastradas
 onibus_por_linha = {}     # dicionário: id da linha → lista de ônibus
@@ -185,4 +186,66 @@ def consultar_horarios_por_cidade():
         print("Nenhuma linha encontrada para essa cidade.\n")
     else:
         print()
+
+#   CONSULTAR ASSENTOS
+
+def consultar_assentos():
+    """Mostra todos os assentos disponpiveis para reserva ou para cancelamento"""
+    print("\n=== CONSULTAR ASSENTOS ===")
+
+    cidade = input("Digite o nome da cidade de destino: ").strip()
+
+    encontrou = False
+    ids_linha = []
+    print("\nLinhas encontradas:\n")
+
+    for linha in linhas:
+        if linha is None:
+            continue
+
+        if cidade.lower() in linha["destino"].lower():
+            encontrou = True
+            ids_linha.append(linha["id"])
+            d.exibir_linha_formatada(linha["id"], linha)
+
+    if not encontrou:
+        print("Nenhuma linha encontrada para essa cidade.\n")
+        return
+    else:
+        print()
+
+    op = -2
+    while op != -1:
+        try:
+            id_linha_escolhido = int(input("Digite o id da linha escolhida: "))
+            op = -1
+            break
+        except ValueError:
+            print("Entrada inválida! Digite apenas números inteiros.")
+ 
+    if id_linha_escolhido in ids_linha:
+        d.mostrar_onibus_da_linha(id_linha_escolhido)
+        d.mostrar_horario_onibus(id_linha_escolhido)
+    else:
+        print("ID inválido!")
+        return
+    
+    data_escolhida = input("Digite a data escolhida (dd/mm): ")
+
+    assento_disponivel = False
+
+    for onibus in onibus_por_linha[id_linha_escolhido]:
+        data_formatada = onibus['data'][:5]
+        if data_escolhida == data_formatada and True in onibus['assentos']:
+            assento_disponivel = True
+            break
+
+    if assento_disponivel is False:
+        print("Nenhum assento disponível para está data!\n")
+        return
+
+    #criar matriz para gerenciar os assentos
+    matriz_assentos = np.arange(1, 21).reshape((2, 10))
+    matriz_controle = np.full(20, True)
+
 
