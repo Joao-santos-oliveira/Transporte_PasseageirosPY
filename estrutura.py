@@ -239,17 +239,16 @@ def consultar_assentos():
     else:
         print()
 
-    op = -2
-    while op != -1:
+    # escolher qual a linha do ônibus, pelo id, e automaticamente escolhe o horário
+    while True:
         try:
             id_linha_escolhido = int(input("Digite o id da linha escolhida: "))
-            op = -1
             break
         except ValueError:
-            print("Entrada inválida! Digite apenas números inteiros.")
+            print("Entrada inválida! Digite apenas números inteiros.\n")
  
     if id_linha_escolhido in ids_linha:
-        d.mostrar_onibus_da_linha(id_linha_escolhido)
+        d.mostrar_onibus_da_linha(id_linha_escolhido) # exibe as datas de funcionamento da linha
     else:
         print("ID inválido!")
         return
@@ -260,7 +259,7 @@ def consultar_assentos():
 
     for onibus in onibus_por_linha[id_linha_escolhido]:
         data_formatada = onibus['data'][:5]
-        if data_escolhida == data_formatada:
+        if data_escolhida == data_formatada: # verifica se tem ônibus disponível nessa data
             onibus_escolhido = onibus
             break
 
@@ -268,21 +267,23 @@ def consultar_assentos():
         print("Nenhum ônibus disponível! Data inválida!\n")
         return
 
-    d.mostrar_horario_onibus(id_linha_escolhido, onibus_escolhido)
+    d.mostrar_horario_onibus(id_linha_escolhido, onibus_escolhido) # mostra o horário já escolhido
     horario_str = linhas[id_linha_escolhido]['horario']
     if ":" not in horario_str:
         horario_str = horario_str + ":00"
     print(f"Horário disponível para essa linha: {horario_str}h\n")
 
-    disponivel= validar_onibus_data_hora(data_escolhida, horario_str)
+    disponivel= validar_onibus_data_hora(data_escolhida, horario_str) # verifica se o ônibus já passou
     if not disponivel:
         print("Este ônibus já passou!")
         return
     elif disponivel == None:
         print("Data ou hora inválida!")
     
-    #criar matriz para gerenciar os assentos
+    # cria matriz para gerenciar os assentos
     matriz_controle = np.array(onibus_escolhido['assentos']).reshape((2, 10))
+
+    # exibe os assentos
     d.exibir_assentos(matriz_controle)
 
     print("O que deseja escolher? ")
@@ -299,6 +300,7 @@ def consultar_assentos():
                 if True in onibus_escolhido['assentos']:
                     assento_disponivel = True
                     assento = int(input("\nInforme o número do assento: "))
+
                     if assento < 1 or assento > 20:
                         print("Número do assento inválido!")
                     else:
@@ -307,13 +309,16 @@ def consultar_assentos():
                             print("Este assento já está reservado!")
                             break
                         elif onibus['assentos'][posicao_assento] == True:
+
+                            # faz a reserva do assento
                             onibus['assentos'][posicao_assento] = False
                             linha_controle = posicao_assento // 10
                             coluna_controle = posicao_assento % 10
                             matriz_controle[linha_controle][coluna_controle] = False
                             print(f"\nAssento {assento} reservado com sucesso!")
-                            d.exibir_assentos(matriz_controle)
+                            #d.exibir_assentos(matriz_controle)
                             break
+
                 elif assento_disponivel is False:
                     print("Nenhum assento disponível para está data!\n")
                     return
@@ -327,6 +332,7 @@ def consultar_assentos():
                 if False in onibus_escolhido['assentos']:
                     assento_disponivel = False
                     assento = int(input("\nInforme o número do assento: "))
+
                     if assento < 1 or assento > 20:
                         print("Número do assento inválido!")
                     else:
@@ -335,13 +341,16 @@ def consultar_assentos():
                             print("Este assento não está reservado!")
                             break
                         elif onibus['assentos'][posicao_assento] == False:
+
+                            # libera o assento
                             onibus['assentos'][posicao_assento] = True
                             linha_controle = posicao_assento // 10
                             coluna_controle = posicao_assento % 10
                             matriz_controle[linha_controle][coluna_controle] = True
                             print(f"\nAssento {assento} liberado com sucesso!\n")
-                            d.exibir_assentos(matriz_controle)
+                            #d.exibir_assentos(matriz_controle)
                             break
+
                 elif assento_disponivel is True:
                     print("\nNenhum assento reservado para está data!\n")
                     return
