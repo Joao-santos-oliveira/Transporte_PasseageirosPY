@@ -187,6 +187,26 @@ def consultar_horarios_por_cidade():
     else:
         print()
 
+#   VALIDAR ÔNIBUS BASEADO NA HORÁRIO E DATA
+
+def validar_onibus_data_hora(data, hora):
+    try:
+        dia, mes = map(int, data.split("/"))
+        hora_atual = datetime.now()
+        hora_onibus = datetime.strptime(hora, "%H:%M").time()
+
+        onibus_dt = datetime(year=hora_atual.year, month=mes, day=dia,hour=hora_onibus.hour, minute=hora_onibus.minute)
+
+        if onibus_dt < hora_atual and (mes, dia) < (hora_atual.month, hora_atual.day):
+            onibus_dt = datetime(year=hora_atual.year + 1, month=mes, day=dia,hour=hora_onibus.hour, minute=hora_onibus.minute)
+
+        if onibus_dt < hora_atual:
+            return False
+        else:
+            return True
+    except ValueError:
+        return None
+    
 #   CONSULTAR ASSENTOS
 
 def consultar_assentos():
@@ -225,27 +245,110 @@ def consultar_assentos():
  
     if id_linha_escolhido in ids_linha:
         d.mostrar_onibus_da_linha(id_linha_escolhido)
-        d.mostrar_horario_onibus(id_linha_escolhido)
     else:
         print("ID inválido!")
         return
     
     data_escolhida = input("Digite a data escolhida (dd/mm): ")
 
-    assento_disponivel = False
+    onibus_escolhido = None
 
     for onibus in onibus_por_linha[id_linha_escolhido]:
         data_formatada = onibus['data'][:5]
-        if data_escolhida == data_formatada and True in onibus['assentos']:
-            assento_disponivel = True
+        if data_escolhida == data_formatada:
+            onibus_escolhido = onibus
             break
 
-    if assento_disponivel is False:
-        print("Nenhum assento disponível para está data!\n")
+    if onibus_escolhido is None:
+        print("Nenhum ônibus disponível! Data inválida!\n")
         return
 
+    d.mostrar_horario_onibus(id_linha_escolhido, onibus_escolhido)
+    horario_str = linhas[id_linha_escolhido]['horario']
+    if ":" not in horario_str:
+        horario_str = horario_str + ":00"
+    print(f"Horário disponível para essa linha: {horario_str}h\n")
+
+    disponivel= validar_onibus_data_hora(data_escolhida, horario_str)
+    if not disponivel:
+        print("Este ônibus já passou!")
+        return
+    elif disponivel == None:
+        print("Data ou hora inválida!")
+    
     #criar matriz para gerenciar os assentos
-    matriz_assentos = np.arange(1, 21).reshape((2, 10))
-    matriz_controle = np.full(20, True)
+    matriz_controle = np.array(onibus_escolhido['assentos']).reshape((2, 10))
+    d.exibir_assentos(matriz_controle)
+
+    print("O que deseja escolher? ")
+    print("1 - Reservar assento")
+    print("2 - Excluir a reserva do assento")
+    print("0 - Cancelar")
+     
+    op = input("Escolha: ")
+
+    assento_disponivel = False
+    if op == "1":
+
+        while True:
+            try:
+                if True in onibus_escolhido['assentos']:
+                    assento_disponivel = True
+                    assento = int(input("\nInforme o número do assento: "))
+                    if assento < 1 or assento > 20:
+                        print("Número do assento inválido!")
+                    else:
+                        posicao_assento = assento - 1
+                        if onibus['assentos'][posicao_assento] == False:
+                            print("Este assento já está reservado!")
+                        elif onibus['assentos'][posicao_assento] == True:
+                            onibus['assentos'][posicao_assento] = False
+                            linha_controle = posicao_assento // 10
+                            coluna_controle = posicao_assento % 10
+                            matriz_controle[linha_controle][coluna_controle] = False
+                            print(f"\nAssento {assento} reservado com sucesso!")
+                            d.exibir_assentos(matriz_controle)
+                            break
+                elif assento_disponivel is False:
+                    print("Nenhum assento disponível para está data!\n")
+                    return
+            except ValueError as e:
+                print(f"Erro ao digitar o número do assento! Por favor, insira apenas números inteiros.")
+
+    elif op == "2":
+        while True:
+            try:
+                if False in onibus_escolhido['assentos']:
+                    assento_disponivel = True
+                    assento = int(input("\nInforme o número do assento: "))
+                    if assento < 1 or assento > 20:
+                        print("Número do assento inválido!")
+                    else:
+                        posicao_assento = assento - 1
+                        if onibus['assentos'][posicao_assento] == False:
+                            print("Este assento já está reservado!")
+                        elif onibus['assentos'][posicao_assento] == True:
+                            onibus['assentos'][posicao_assento] = False
+                            linha_controle = posicao_assento // 10
+                            coluna_controle = posicao_assento % 10
+                            matriz_controle[linha_controle][coluna_controle] = False
+                            print(f"\nAssento {assento} reservado com sucesso!")
+                            d.exibir_assentos(matriz_controle)
+                            break
+                elif assento_disponivel is False:
+                    print("Nenhum assento disponível para está data!\n")
+                    return
+            except ValueError as e:
+                print(f"Erro ao digitar o número do assento! Por favor, insira apenas números inteiros.")
+
+        print("\nAlteração realizada com sucesso!\n")
+    elif op == "0":
+        print("Edição cancelada.")
+        return
+    else:
+        print("Opção inválida.")
+        return
+
+    
 
 
