@@ -191,15 +191,20 @@ def consultar_horarios_por_cidade():
 
 def validar_onibus_data_hora(data, hora):
     try:
+    
         dia, mes = map(int, data.split("/"))
         hora_atual = datetime.now()
         hora_onibus = datetime.strptime(hora, "%H:%M").time()
 
         onibus_dt = datetime(year=hora_atual.year, month=mes, day=dia,hour=hora_onibus.hour, minute=hora_onibus.minute)
 
+        # verifica se a data/hora do ônibus já passou do dia atual
         if onibus_dt < hora_atual and (mes, dia) < (hora_atual.month, hora_atual.day):
+            # se a data ainda vai acontecer no ano seguinte (ex: escolheu 05/01 e hoje é 20/12),
+            # muda o ano do ônibus para o ano seguinte
             onibus_dt = datetime(year=hora_atual.year + 1, month=mes, day=dia,hour=hora_onibus.hour, minute=hora_onibus.minute)
 
+        # depois de ajustar o ano, verifica novamente se o ônibus já passou
         if onibus_dt < hora_atual:
             return False
         else:
@@ -287,9 +292,8 @@ def consultar_assentos():
      
     op = input("Escolha: ")
 
-    assento_disponivel = False
     if op == "1":
-
+        assento_disponivel = False
         while True:
             try:
                 if True in onibus_escolhido['assentos']:
@@ -301,6 +305,7 @@ def consultar_assentos():
                         posicao_assento = assento - 1
                         if onibus['assentos'][posicao_assento] == False:
                             print("Este assento já está reservado!")
+                            break
                         elif onibus['assentos'][posicao_assento] == True:
                             onibus['assentos'][posicao_assento] = False
                             linha_controle = posicao_assento // 10
@@ -316,32 +321,33 @@ def consultar_assentos():
                 print(f"Erro ao digitar o número do assento! Por favor, insira apenas números inteiros.")
 
     elif op == "2":
+        assento_disponivel = True
         while True:
             try:
                 if False in onibus_escolhido['assentos']:
-                    assento_disponivel = True
+                    assento_disponivel = False
                     assento = int(input("\nInforme o número do assento: "))
                     if assento < 1 or assento > 20:
                         print("Número do assento inválido!")
                     else:
                         posicao_assento = assento - 1
-                        if onibus['assentos'][posicao_assento] == False:
-                            print("Este assento já está reservado!")
-                        elif onibus['assentos'][posicao_assento] == True:
-                            onibus['assentos'][posicao_assento] = False
+                        if onibus['assentos'][posicao_assento] == True:
+                            print("Este assento não está reservado!")
+                            break
+                        elif onibus['assentos'][posicao_assento] == False:
+                            onibus['assentos'][posicao_assento] = True
                             linha_controle = posicao_assento // 10
                             coluna_controle = posicao_assento % 10
-                            matriz_controle[linha_controle][coluna_controle] = False
-                            print(f"\nAssento {assento} reservado com sucesso!")
+                            matriz_controle[linha_controle][coluna_controle] = True
+                            print(f"\nAssento {assento} liberado com sucesso!\n")
                             d.exibir_assentos(matriz_controle)
                             break
-                elif assento_disponivel is False:
-                    print("Nenhum assento disponível para está data!\n")
+                elif assento_disponivel is True:
+                    print("\nNenhum assento reservado para está data!\n")
                     return
             except ValueError as e:
                 print(f"Erro ao digitar o número do assento! Por favor, insira apenas números inteiros.")
 
-        print("\nAlteração realizada com sucesso!\n")
     elif op == "0":
         print("Edição cancelada.")
         return

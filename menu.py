@@ -15,7 +15,7 @@ def menu():
         print(f"{C.AMARELO_CLARO}4 - Mostrar todas as linhas cadastradas{C.RESET}")
         print(f"{C.AMARELO_CLARO}5 - Consultar horários por cidade{C.RESET}")
         print(f"{C.AMARELO_CLARO}6 - Mostrar ônibus de uma linha específica{C.RESET}")
-        print(f"{C.AMARELO_CLARO}7 - Consultar assentos  {C.CIANO}(A IMPLEMENTAR){C.RESET}")
+        print(f"{C.AMARELO_CLARO}7 - Consultar assentos{C.RESET}")
         print(f"{C.AMARELO_CLARO}8 - Ler Reservas a Partir de Arquivo de texto {C.CIANO}(A IMPLEMENTAR){C.RESET}")
         print(f"{C.AMARELO_CLARO}9 - Gravar Reservas Inválidas em arquivo de texto {C.CIANO}(A IMPLEMENTAR){C.RESET}")
         print(f"{C.AMARELO_CLARO}10 - Relatórios / Estatísticas  {C.CIANO}(A IMPLEMENTAR){C.RESET}")
@@ -46,13 +46,12 @@ def menu():
                 linha_id = int(input(f"{C.BRANCO}Digite o ID da linha: {C.RESET}"))
                 d.mostrar_onibus_da_linha(linha_id)
             except:
-                print(f"{C.VERMELHO}ID inválido!{C.RESET}")
-
-        # OPÇÕES A IMPLEMENTAR    
+                print(f"{C.VERMELHO}ID inválido!{C.RESET}")   
 
         elif opc == "7":
-            #print("\n Função 'Consultar assentos' ainda não implementada.\n")
             e.consultar_assentos()
+
+#       OPÇÕES A IMPLEMENTAR 
 
         elif opc == "8":
             print("\n Função 'Ler Reservas a Partir de Arquivo de texto' ainda não implementada.\n")

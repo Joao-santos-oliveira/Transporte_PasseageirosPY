@@ -62,7 +62,7 @@ def mostrar_linhas():
 
 
 def mostrar_horario_onibus(linha_id, onibus_escolhido):
-    """Exibe os ônibus da linha em formato de calendário, mostrando assentos livres."""
+    """Exibe o horário do ônibus da linha escolhida em formato de calendário, mostrando assentos livres."""
     if linha_id < 0 or linha_id >= len(e.linhas):
         print(f"{C.VERMELHO}ID inexistente!{C.RESET}\n")
         return
@@ -89,7 +89,7 @@ def mostrar_horario_onibus(linha_id, onibus_escolhido):
     linha_impressao = ""
     count = 0
 
-    horario = linha['horario'][:5]  # dd/mm
+    horario = linha['horario'][:5]  # hh/mm
     livres = sum(onibus_escolhido["assentos"])
 
         # Escolhendo cor com base no número de assentos livres
@@ -100,7 +100,7 @@ def mostrar_horario_onibus(linha_id, onibus_escolhido):
     else:
         cor = C.VERMELHO
 
-    # Ex.: 16/11 (20)
+    # Ex.: 12h (20)
     linha_impressao += f"{cor}{horario}h ({livres}){C.RESET}".ljust(14)
     count += 1
 
@@ -117,6 +117,7 @@ def mostrar_horario_onibus(linha_id, onibus_escolhido):
     print(f"{C.VERDE}(20){C.RESET} = todos os assentos livres")
     print(f"{C.AMARELO}(10-19){C.RESET} = disponibilidade moderada")
     print(f"{C.VERMELHO}(0-9){C.RESET} = poucos assentos\n")
+
 
 
 def mostrar_onibus_da_linha(linha_id):
@@ -177,16 +178,20 @@ def mostrar_onibus_da_linha(linha_id):
     print(f"{C.AMARELO}(10-19){C.RESET} = disponibilidade moderada")
     print(f"{C.VERMELHO}(0-9){C.RESET} = poucos assentos\n")
 
-def exibir_assentos(matriz_controle):
-   
-    matriz_assentos = np.arange(1, 21).reshape((2, 10))
 
+
+def exibir_assentos(matriz_controle):
+    """Exibe os assentos do ônibus escolhido, mostrando a disponibilidade de acordo com as cores."""
+
+    matriz_assentos = np.arange(1, 21).reshape((2, 10)) # matriz para mostrar o número do assento
+
+    # usa a matriz de controle para verificar se está disponível ou não
     print(f"\n{C.AMARELO}{C.NEGRITO}📅 Visualização dos Assentos:{C.RESET}")
     print("-"*60)
     for linha in range(matriz_assentos.shape[0]):
         for coluna in range(matriz_assentos.shape[1]):
             if matriz_controle[linha][coluna] == True:
-                print(f"[{C.VERDE}{matriz_assentos[linha][coluna]:02d}{C.RESET}]", end=" ")
+                print(f"[{C.VERDE}{matriz_assentos[linha][coluna]:02d}{C.RESET}]", end=" ") 
             elif matriz_controle[linha][coluna] == False:
                 print(f"[{C.VERMELHO}{matriz_assentos[linha][coluna]:02d}{C.RESET}]", end=" ")
         print()
