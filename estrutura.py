@@ -316,6 +316,7 @@ def consultar_assentos():
                             coluna_controle = posicao_assento % 10
                             matriz_controle[linha_controle][coluna_controle] = False
                             print(f"\nAssento {assento} reservado com sucesso!")
+                            gravar_reservas_corretas(cidade, horario_str, data_formatada, assento)
                             #d.exibir_assentos(matriz_controle)
                             break
 
@@ -348,6 +349,7 @@ def consultar_assentos():
                             coluna_controle = posicao_assento % 10
                             matriz_controle[linha_controle][coluna_controle] = True
                             print(f"\nAssento {assento} liberado com sucesso!\n")
+                            excluir_reserva_arquivo(cidade, horario_str, data_formatada, assento)
                             #d.exibir_assentos(matriz_controle)
                             break
 
@@ -365,5 +367,58 @@ def consultar_assentos():
         return
 
     
+def gravar_reservas_corretas(cidade, hora, data, assento):
+    nome_arquivo = "reservarCorretas.txt"
+    try:
+        with open(nome_arquivo, "a", encoding='utf-8') as arq:
+            mensagem = f"{cidade.title()}, {hora}, {data}, {assento}\n"
+            arq.write(mensagem)
+    except Exception as e:
+        print(f"Erro ao gravar reserva no arquivo: {e}")
+
+def excluir_reserva_arquivo(cidade, hora, data, assento):
+    nome_arquivo = "reservarCorretas.txt"
+    mensagem = f"{cidade.title()}, {hora}, {data}, {assento}".lower().strip()
+
+    try:
+        with open(nome_arquivo, "r", encoding='utf-8') as arq:
+            linhas = arq.readlines()
+
+        with open(nome_arquivo, "w", encoding='utf-8') as arq:
+            for linha in linhas:
+                if linha.strip().lower() != mensagem:
+                    arq.write(linha)
+
+    except Exception as e:
+        print(f"Erro ao apagar reserva no arquivo: {e}")
+
+def gravar_tentativa_reserva(cidade="Não encontrada", hora="??:??", data="??/??/????", assento):
+    nome_arquivo = "reservarCorretas.txt"
+    try:
+        with open(nome_arquivo, "a", encoding='utf-8') as arq:
+            mensagem = f"{cidade.title()}, {hora}, {data}, {assento}\n"
+            arq.write(mensagem)
+    except Exception as e:
+        print(f"Erro ao gravar reserva no arquivo: {e}")
+
+def ler_arquivo(nome_arquivo):
+    try:
+        reservas = []
+        if nome_arquivo == "reservarCorretas.txt":
+            with open(nome_arquivo, "r", encoding='utf-8') as arq:
+                for linha in arq:
+                    cidade, hora, data, assento = [campo.strip() for campo in linha.split(",")]
+                    nova_linha = {
+                        'cidade': cidade.strip(),
+                        'data': data.strip(),
+                        'hora': hora.strip(),
+                        'assento': assento.strip()
+                    }
+                    reservas.append(nova_linha)
+        return reservas
+    except Exception as e:
+        print("Erro ao ler arquivo: ", e)
+        return None
+
 
 

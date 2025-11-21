@@ -202,3 +202,34 @@ def exibir_assentos(matriz_controle):
     print(f"[ {C.VERDE}🟩{C.RESET} ] = assento disponível")
     print(f"[ {C.VERMELHO}🟥{C.RESET} ] = assento indisponível")
     print(f"Assentos ímpares têm vista para janela.\n")
+
+
+def exibir_arquivo(nome_arquivo, arquivo):
+    try:
+        if nome_arquivo == "reservarCorretas.txt":
+
+            if not arquivo:
+                print("Nenhuma reserva encontrada.")
+                return
+            
+            print()
+            print("="*60)
+            print(f"{C.CIANO}{C.NEGRITO} LISTA DE RESERVAS {C.RESET}")
+            print("="*60)
+            print()
+
+            for i, reserva in enumerate(arquivo):
+                cidade = reserva.get('cidade', '???')
+                data = reserva.get('data', '??/??/????')
+                hora = reserva.get('hora', '??:??')
+                assento = reserva.get('assento', '??')
+
+                print(f"Reserva {i+1}) {cidade}")
+                print(f"Data: {data}")
+                print(f"Hora: {hora}")
+                print(f"Assento: {assento}")
+                print("-" * 60)
+                
+
+    except Exception as e:
+        print("Erro ao exibir arquivo: ", e)
