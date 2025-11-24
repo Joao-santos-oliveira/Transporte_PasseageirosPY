@@ -17,7 +17,7 @@ def menu():
         print(f"{C.AMARELO_CLARO}6 - Mostrar ônibus de uma linha específica{C.RESET}")
         print(f"{C.AMARELO_CLARO}7 - Consultar assentos{C.RESET}")
         print(f"{C.AMARELO_CLARO}8 - Ler Reservas a Partir de Arquivo de texto{C.RESET}")
-        print(f"{C.AMARELO_CLARO}9 - Gravar Reservas Inválidas em arquivo de texto {C.CIANO}(A IMPLEMENTAR){C.RESET}")
+        print(f"{C.AMARELO_CLARO}9 - Visualizar Reservas Inválidas em arquivo de texto {C.CIANO}(A IMPLEMENTAR){C.RESET}")
         print(f"{C.AMARELO_CLARO}10 - Relatórios / Estatísticas  {C.CIANO}(A IMPLEMENTAR){C.RESET}")
         print(f"{C.AZUL}{C.NEGRITO}0 - Sair{C.RESET}")
         print(C.AZUL + C.NEGRITO + "="*60 + C.RESET)

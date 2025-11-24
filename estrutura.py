@@ -234,6 +234,7 @@ def consultar_assentos():
             d.exibir_linha_formatada(linha["id"], linha)
 
     if not encontrou:
+        gravar_reserva_invalida("1")
         print("Nenhuma linha encontrada para essa cidade.\n")
         return
     else:
@@ -250,6 +251,7 @@ def consultar_assentos():
     if id_linha_escolhido in ids_linha:
         d.mostrar_onibus_da_linha(id_linha_escolhido) # exibe as datas de funcionamento da linha
     else:
+        gravar_reserva_invalida("2")
         print("ID inválido!")
         return
     
@@ -261,9 +263,11 @@ def consultar_assentos():
         data_formatada = onibus['data'][:5]
         if data_escolhida == data_formatada: # verifica se tem ônibus disponível nessa data
             onibus_escolhido = onibus
+            data_original = onibus['data']
             break
 
     if onibus_escolhido is None:
+        gravar_reserva_invalida("3")
         print("Nenhum ônibus disponível! Data inválida!\n")
         return
 
@@ -275,10 +279,13 @@ def consultar_assentos():
 
     disponivel= validar_onibus_data_hora(data_escolhida, horario_str) # verifica se o ônibus já passou
     if not disponivel:
+        gravar_reserva_invalida("4")
         print("Este ônibus já passou!")
         return
     elif disponivel == None:
-        print("Data ou hora inválida!")
+        gravar_reserva_invalida("5")
+        print("Formato da data ou hora inválida!")
+        return
     
     # cria matriz para gerenciar os assentos
     matriz_controle = np.array(onibus_escolhido['assentos']).reshape((2, 10))
@@ -306,6 +313,7 @@ def consultar_assentos():
                     else:
                         posicao_assento = assento - 1
                         if onibus['assentos'][posicao_assento] == False:
+                            gravar_reserva_invalida("7")
                             print("Este assento já está reservado!")
                             break
                         elif onibus['assentos'][posicao_assento] == True:
@@ -316,11 +324,12 @@ def consultar_assentos():
                             coluna_controle = posicao_assento % 10
                             matriz_controle[linha_controle][coluna_controle] = False
                             print(f"\nAssento {assento} reservado com sucesso!")
-                            gravar_reservas_corretas(cidade, horario_str, data_formatada, assento)
+                            gravar_reservas_corretas(cidade, horario_str, data_original, assento)
                             #d.exibir_assentos(matriz_controle)
                             break
 
                 elif assento_disponivel is False:
+                    gravar_reserva_invalida("6")
                     print("Nenhum assento disponível para está data!\n")
                     return
             except ValueError as e:
@@ -339,6 +348,7 @@ def consultar_assentos():
                     else:
                         posicao_assento = assento - 1
                         if onibus['assentos'][posicao_assento] == True:
+                            gravar_reserva_invalida("8")
                             print("Este assento não está reservado!")
                             break
                         elif onibus['assentos'][posicao_assento] == False:
@@ -349,11 +359,12 @@ def consultar_assentos():
                             coluna_controle = posicao_assento % 10
                             matriz_controle[linha_controle][coluna_controle] = True
                             print(f"\nAssento {assento} liberado com sucesso!\n")
-                            excluir_reserva_arquivo(cidade, horario_str, data_formatada, assento)
+                            excluir_reserva_arquivo(cidade, horario_str, data_original, assento)
                             #d.exibir_assentos(matriz_controle)
                             break
 
                 elif assento_disponivel is True:
+                    gravar_reserva_invalida("9")
                     print("\nNenhum assento reservado para está data!\n")
                     return
             except ValueError as e:
@@ -366,7 +377,8 @@ def consultar_assentos():
         print("Opção inválida.")
         return
 
-    
+#   ARQUIVO COM RESERVAS CORRETAS
+
 def gravar_reservas_corretas(cidade, hora, data, assento):
     nome_arquivo = "reservarCorretas.txt"
     try:
@@ -392,14 +404,32 @@ def excluir_reserva_arquivo(cidade, hora, data, assento):
     except Exception as e:
         print(f"Erro ao apagar reserva no arquivo: {e}")
 
-def gravar_tentativa_reserva(cidade="Não encontrada", hora="??:??", data="??/??/????", assento):
-    nome_arquivo = "reservarCorretas.txt"
+#   ARQUIVO RESERVAS INVÁLIDAS
+
+def gravar_reserva_invalida(erro='Erro inesperado ao realizar reserva!', cidade="Não encontrada", hora='??:??', data='??/??/????', assento='??'):
+    nome_arquivo = "reservasIncorretas.txt"
+
+    erros_map = {
+        "1": "Nenhuma linha encontrada para essa cidade.",
+        "2": "ID inválido para escolher a linha!",
+        "3": "Nenhum ônibus disponível! Data inválida!",
+        "4": "Este ônibus já passou!",
+        "5": "Formato da data ou hora inválida!",
+        "6": "Nenhum assento disponível para esta data!",
+        "7": "Este assento já está reservado!",
+        "8": "Este assento não está reservado, impossível desfazer reserva!",
+        "9": "Nenhum assento reservado para esta data!"
+    }
+
+    cidade= cidade.strip() or "Não encontrada"
+    erro_msg = erros_map.get(str(erro), erro)
+
     try:
         with open(nome_arquivo, "a", encoding='utf-8') as arq:
-            mensagem = f"{cidade.title()}, {hora}, {data}, {assento}\n"
+            mensagem = f"[{hora} - {data}] | {cidade.title()} | Assento {assento} | Erro: {erro_msg}\n"
             arq.write(mensagem)
     except Exception as e:
-        print(f"Erro ao gravar reserva no arquivo: {e}")
+        print(f"Erro ao gravar erro de reserva no arquivo: {e}")
 
 def ler_arquivo(nome_arquivo):
     try:
