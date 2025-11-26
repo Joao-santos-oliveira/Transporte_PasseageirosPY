@@ -230,6 +230,31 @@ def exibir_arquivo(nome_arquivo, arquivo):
                 print(f"Assento: {assento}")
                 print("-" * 60)
                 
+        elif nome_arquivo == "reservasIncorretas.txt":
+            if not arquivo:
+                print("Nenhuma reserva encontrada.")
+                return
+            
+            print()
+            print("="*60)
+            print(f"{C.CIANO}{C.NEGRITO} LISTA DE RESERVAS INCORRETAS {C.RESET}")
+            print("="*60)
+            print()
+
+            for i, reserva in enumerate(arquivo):
+                cidade = reserva.get('cidade', '???')
+                data = reserva.get('data', '??/??/????')
+                hora = reserva.get('hora', '??:??')
+                assento = reserva.get('assento', '??')
+                erro = reserva.get('erro', '?')
+
+                print(f"Reserva {i+1}) {cidade}")
+                print(f"Data: {data}")
+                print(f"Hora: {hora}")
+                print(f"Assento: {assento}")
+                print(f"Erro: {erro.title()}")
+                print("-" * 60)
+            
 
     except Exception as e:
         print("Erro ao exibir arquivo: ", e)

@@ -17,7 +17,7 @@ def menu():
         print(f"{C.AMARELO_CLARO}6 - Mostrar ônibus de uma linha específica{C.RESET}")
         print(f"{C.AMARELO_CLARO}7 - Consultar assentos{C.RESET}")
         print(f"{C.AMARELO_CLARO}8 - Ler Reservas a Partir de Arquivo de texto{C.RESET}")
-        print(f"{C.AMARELO_CLARO}9 - Visualizar Reservas Inválidas em arquivo de texto {C.CIANO}(A IMPLEMENTAR){C.RESET}")
+        print(f"{C.AMARELO_CLARO}9 - Visualizar Reservas Inválidas em arquivo de texto{C.RESET}")
         print(f"{C.AMARELO_CLARO}10 - Relatórios / Estatísticas  {C.CIANO}(A IMPLEMENTAR){C.RESET}")
         print(f"{C.AZUL}{C.NEGRITO}0 - Sair{C.RESET}")
         print(C.AZUL + C.NEGRITO + "="*60 + C.RESET)
@@ -51,15 +51,19 @@ def menu():
         elif opc == "7":
             e.consultar_assentos()
 
-#       OPÇÕES A IMPLEMENTAR 
-
         elif opc == "8":
             #print("\n Função 'Ler Reservas a Partir de Arquivo de texto' ainda não implementada.\n")
             arquivo = e.ler_arquivo("reservarCorretas.txt")
             d.exibir_arquivo("reservarCorretas.txt", arquivo)
 
         elif opc == "9":
-            print("\n Função 'Gravar Reservas Inválidas em arquivo de texto' ainda não implementada.\n")    
+            #print("\n Função 'Gravar Reservas Inválidas em arquivo de texto' ainda não implementada.\n")
+            arquivo = e.ler_arquivo("reservasIncorretas.txt")    
+            d.exibir_arquivo("reservasIncorretas.txt", arquivo)
+
+
+#       OPÇÕES A IMPLEMENTAR 
+
 
         elif opc == "10":
             print("\n Função 'Relatórios' ainda não implementada.\n")

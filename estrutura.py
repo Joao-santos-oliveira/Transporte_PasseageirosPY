@@ -234,7 +234,7 @@ def consultar_assentos():
             d.exibir_linha_formatada(linha["id"], linha)
 
     if not encontrou:
-        gravar_reserva_invalida("1")
+        gravar_reserva_invalida("1", cidade)
         print("Nenhuma linha encontrada para essa cidade.\n")
         return
     else:
@@ -251,11 +251,19 @@ def consultar_assentos():
     if id_linha_escolhido in ids_linha:
         d.mostrar_onibus_da_linha(id_linha_escolhido) # exibe as datas de funcionamento da linha
     else:
-        gravar_reserva_invalida("2")
+        gravar_reserva_invalida("2", cidade)
         print("ID inválido!")
         return
     
     data_escolhida = input("Digite a data escolhida (dd/mm): ")
+
+    try:
+        dia, mes = data_escolhida.split("/")
+        data_escolhida = f"{int(dia):02d}/{int(mes):02d}"
+    except:
+        print("Formato de data inválido!")
+        gravar_reserva_invalida("5", cidade, data=data_original)
+        return
 
     onibus_escolhido = None
 
@@ -267,7 +275,7 @@ def consultar_assentos():
             break
 
     if onibus_escolhido is None:
-        gravar_reserva_invalida("3")
+        gravar_reserva_invalida("3", cidade, data=data_escolhida)
         print("Nenhum ônibus disponível! Data inválida!\n")
         return
 
@@ -279,11 +287,11 @@ def consultar_assentos():
 
     disponivel= validar_onibus_data_hora(data_escolhida, horario_str) # verifica se o ônibus já passou
     if not disponivel:
-        gravar_reserva_invalida("4")
+        gravar_reserva_invalida("4", cidade, horario_str, data_original)
         print("Este ônibus já passou!")
         return
     elif disponivel == None:
-        gravar_reserva_invalida("5")
+        gravar_reserva_invalida("5", cidade, horario_str, data_original)
         print("Formato da data ou hora inválida!")
         return
     
@@ -310,10 +318,12 @@ def consultar_assentos():
 
                     if assento < 1 or assento > 20:
                         print("Número do assento inválido!")
+                        gravar_reserva_invalida("10",  cidade, horario_str, data_original, assento)
+                        break
                     else:
                         posicao_assento = assento - 1
                         if onibus['assentos'][posicao_assento] == False:
-                            gravar_reserva_invalida("7")
+                            gravar_reserva_invalida("7", cidade, horario_str, data_original, assento)
                             print("Este assento já está reservado!")
                             break
                         elif onibus['assentos'][posicao_assento] == True:
@@ -329,7 +339,8 @@ def consultar_assentos():
                             break
 
                 elif assento_disponivel is False:
-                    gravar_reserva_invalida("6")
+                    assento = "??" 
+                    gravar_reserva_invalida("6", cidade, horario_str, data_original, assento)
                     print("Nenhum assento disponível para está data!\n")
                     return
             except ValueError as e:
@@ -345,10 +356,12 @@ def consultar_assentos():
 
                     if assento < 1 or assento > 20:
                         print("Número do assento inválido!")
+                        gravar_reserva_invalida("10",  cidade, horario_str, data_original, assento)
+                        break
                     else:
                         posicao_assento = assento - 1
                         if onibus['assentos'][posicao_assento] == True:
-                            gravar_reserva_invalida("8")
+                            gravar_reserva_invalida("8", cidade, horario_str, data_original, assento)
                             print("Este assento não está reservado!")
                             break
                         elif onibus['assentos'][posicao_assento] == False:
@@ -364,7 +377,8 @@ def consultar_assentos():
                             break
 
                 elif assento_disponivel is True:
-                    gravar_reserva_invalida("9")
+                    assento = "??" 
+                    gravar_reserva_invalida("9", cidade, horario_str, data_original, assento)
                     print("\nNenhum assento reservado para está data!\n")
                     return
             except ValueError as e:
@@ -418,7 +432,8 @@ def gravar_reserva_invalida(erro='Erro inesperado ao realizar reserva!', cidade=
         "6": "Nenhum assento disponível para esta data!",
         "7": "Este assento já está reservado!",
         "8": "Este assento não está reservado, impossível desfazer reserva!",
-        "9": "Nenhum assento reservado para esta data!"
+        "9": "Nenhum assento reservado para esta data!",
+        "10": "Número do assento inválido!"
     }
 
     cidade= cidade.strip() or "Não encontrada"
@@ -426,7 +441,7 @@ def gravar_reserva_invalida(erro='Erro inesperado ao realizar reserva!', cidade=
 
     try:
         with open(nome_arquivo, "a", encoding='utf-8') as arq:
-            mensagem = f"[{hora} - {data}] | {cidade.title()} | Assento {assento} | Erro: {erro_msg}\n"
+            mensagem = f"{cidade.title()}, {hora}, {data}, {assento}, {erro_msg}\n"
             arq.write(mensagem)
     except Exception as e:
         print(f"Erro ao gravar erro de reserva no arquivo: {e}")
@@ -443,6 +458,19 @@ def ler_arquivo(nome_arquivo):
                         'data': data.strip(),
                         'hora': hora.strip(),
                         'assento': assento.strip()
+                    }
+                    reservas.append(nova_linha)
+
+        elif nome_arquivo == "reservasIncorretas.txt":
+            with open(nome_arquivo, "r", encoding='utf-8') as arq:
+                for linha in arq:
+                    cidade, hora, data, assento, erro = [campo.strip() for campo in linha.split(",")]
+                    nova_linha = {
+                        'cidade': cidade.strip(),
+                        'data': data.strip(),
+                        'hora': hora.strip(),
+                        'assento': assento.strip(),
+                        'erro': erro.strip()
                     }
                     reservas.append(nova_linha)
         return reservas
