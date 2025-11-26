@@ -181,27 +181,61 @@ def mostrar_onibus_da_linha(linha_id):
 
 
 def exibir_assentos(matriz_controle):
-    """Exibe os assentos do ônibus escolhido, mostrando a disponibilidade de acordo com as cores."""
+    """Exibe assentos no formato:
+       01 02    04 03
+       05 06    08 07
+       ...
+    """
 
-    matriz_assentos = np.arange(1, 21).reshape((2, 10)) # matriz para mostrar o número do assento
-
-    # usa a matriz de controle para verificar se está disponível ou não
     print(f"\n{C.AMARELO}{C.NEGRITO}📅 Visualização dos Assentos:{C.RESET}")
     print("-"*60)
-    for linha in range(matriz_assentos.shape[0]):
-        for coluna in range(matriz_assentos.shape[1]):
-            if matriz_controle[linha][coluna] == True:
-                print(f"[{C.VERDE}{matriz_assentos[linha][coluna]:02d}{C.RESET}]", end=" ") 
-            elif matriz_controle[linha][coluna] == False:
-                print(f"[{C.VERMELHO}{matriz_assentos[linha][coluna]:02d}{C.RESET}]", end=" ")
-        print()
-        if linha == 0:
-            print()
+
+    for i in range(1, 20, 4):  
+        # esquerda
+        a1 = i
+        a2 = i+1
+
+        # direita (invertido)
+        a3 = i+3
+        a4 = i+2
+
+        # Função auxiliar para pegar cor conforme disponível
+        def cor_assento(num):
+            linha = (num - 1) // 10
+            col = (num - 1) % 10
+            return C.VERDE if matriz_controle[linha][col] else C.VERMELHO
+
+        c1 = cor_assento(a1)
+        c2 = cor_assento(a2)
+
+        if a3 <= 20:
+            c3 = cor_assento(a3)
+        else:
+            c3 = ""
+
+        if a4 <= 20:
+            c4 = cor_assento(a4)
+        else:
+            c4 = ""
+
+        # Monta a linha com espaçamento do corredor
+        linha_texto = (
+            f"{c1}{a1:02d}{C.RESET} "
+            f"{c2}{a2:02d}{C.RESET}    "
+        )
+
+        if a3 <= 20:
+            linha_texto += f"{c3}{a3:02d}{C.RESET} "
+        if a4 <= 20:
+            linha_texto += f"{c4}{a4:02d}{C.RESET}"
+
+        print(linha_texto)
+
     print("-"*60)
     print(f"{C.CIANO}Legenda:{C.RESET}")
-    print(f"[ {C.VERDE}🟩{C.RESET} ] = assento disponível")
-    print(f"[ {C.VERMELHO}🟥{C.RESET} ] = assento indisponível")
-    print(f"Assentos ímpares têm vista para janela.\n")
+    print(f"[ {C.VERDE}🟩{C.RESET} ] = Assento disponível") 
+    print(f"[ {C.VERMELHO}🟥{C.RESET} ] = Assento indisponível")
+    print("Ímpares = Janela esquerda | Pares = Corredor \n")
 
 
 def exibir_arquivo(nome_arquivo, arquivo):
@@ -258,3 +292,4 @@ def exibir_arquivo(nome_arquivo, arquivo):
 
     except Exception as e:
         print("Erro ao exibir arquivo: ", e)
+
