@@ -1,9 +1,13 @@
 import design_estrutura as d 
 from datetime import datetime, timedelta
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 linhas = []               # lista de linhas cadastradas
 onibus_por_linha = {}     # dicionário: id da linha → lista de ônibus
+erros_ocorridos = []   # lista para guardar erros ocorridos em tempo real
+
 
 
 
@@ -334,7 +338,7 @@ def consultar_assentos():
                             coluna_controle = posicao_assento % 10
                             matriz_controle[linha_controle][coluna_controle] = False
                             print(f"\nAssento {assento} reservado com sucesso!")
-                            gravar_reservas_corretas(cidade, horario_str, data_original, assento)
+                            #gravar_reservas_corretas(cidade, horario_str, data_original, assento)
                             #d.exibir_assentos(matriz_controle)
                             break
 
@@ -372,7 +376,7 @@ def consultar_assentos():
                             coluna_controle = posicao_assento % 10
                             matriz_controle[linha_controle][coluna_controle] = True
                             print(f"\nAssento {assento} liberado com sucesso!\n")
-                            excluir_reserva_arquivo(cidade, horario_str, data_original, assento)
+                            #excluir_reserva_arquivo(cidade, horario_str, data_original, assento)
                             #d.exibir_assentos(matriz_controle)
                             break
 
@@ -393,7 +397,7 @@ def consultar_assentos():
 
 #   ARQUIVO COM RESERVAS CORRETAS
 
-def gravar_reservas_corretas(cidade, hora, data, assento):
+'''def gravar_reservas_corretas(cidade, hora, data, assento):
     nome_arquivo = "reservarCorretas.txt"
     try:
         with open(nome_arquivo, "a", encoding='utf-8') as arq:
@@ -416,12 +420,14 @@ def excluir_reserva_arquivo(cidade, hora, data, assento):
                     arq.write(linha)
 
     except Exception as e:
-        print(f"Erro ao apagar reserva no arquivo: {e}")
+        print(f"Erro ao apagar reserva no arquivo: {e}")'''
 
 #   ARQUIVO RESERVAS INVÁLIDAS
-
 def gravar_reserva_invalida(erro='Erro inesperado ao realizar reserva!', cidade="Não encontrada", hora='??:??', data='??/??/????', assento='??'):
-    nome_arquivo = "reservasIncorretas.txt"
+
+    global erros_ocorridos
+
+    nome_arquivo = "relatorioErros.txt"
 
     erros_map = {
         "1": "Nenhuma linha encontrada para essa cidade.",
@@ -436,47 +442,270 @@ def gravar_reserva_invalida(erro='Erro inesperado ao realizar reserva!', cidade=
         "10": "Número do assento inválido!"
     }
 
-    cidade= cidade.strip() or "Não encontrada"
+    cidade = cidade.strip() or "Não encontrada"
     erro_msg = erros_map.get(str(erro), erro)
 
+    registro = {
+        "cidade": cidade.title(),
+        "hora": hora,
+        "data": data,
+        "assento": assento,
+        "erro": erro_msg
+    }
+
+    # 1) salva em memória
+    erros_ocorridos.append(registro)
+
+    # 2) salva no arquivo
     try:
         with open(nome_arquivo, "a", encoding='utf-8') as arq:
-            mensagem = f"{cidade.title()}, {hora}, {data}, {assento}, {erro_msg}\n"
-            arq.write(mensagem)
-    except Exception as e:
-        print(f"Erro ao gravar erro de reserva no arquivo: {e}")
+            linha = f"{registro['cidade']}, {hora}, {data}, {assento}, {erro_msg}\n"
+            arq.write(linha)
+    except:
+        print("Erro ao gravar erro no arquivo.")
+        
+def mostrar_erros():
+    global erros_ocorridos
 
-def ler_arquivo(nome_arquivo):
+    if not erros_ocorridos:
+        print("\nNenhum erro registrado ainda.\n")
+        return
+
+    print("\nComo deseja visualizar os erros?")
+    print("1 - Exibir no terminal")
+    print("2 - Exportar para arquivo texto")
+    opc = input("Escolha: ")
+
+    if opc == "1":
+        print("\n=== ERROS REGISTRADOS ===\n")
+        for e in erros_ocorridos:
+            print(f"{e['cidade']}, {e['hora']}, {e['data']}, {e['assento']}, {e['erro']}")
+        print()
+
+    elif opc == "2":
+        nome = "relatorioErros.txt"
+        try:
+            with open(nome, "w", encoding="utf-8") as file:
+                for e in erros_ocorridos:
+                    file.write(f"{e['cidade']}, {e['hora']}, {e['data']}, {e['assento']}, {e['erro']}\n")
+            print(f"\nArquivo '{nome}' gerado com sucesso!\n")
+        except:
+            print("Erro ao gerar arquivo!")
+
+    else:
+        print("Opção inválida.")
+
+def importar_reservas_arquivo():
+    print("\n=== IMPORTAR RESERVAS DE ARQUIVO ===")
+    nome_arquivo = input("Digite o nome do arquivo (ex: reservas.txt): ").strip()
+
     try:
-        reservas = []
-        if nome_arquivo == "reservarCorretas.txt":
-            with open(nome_arquivo, "r", encoding='utf-8') as arq:
-                for linha in arq:
-                    cidade, hora, data, assento = [campo.strip() for campo in linha.split(",")]
-                    nova_linha = {
-                        'cidade': cidade.strip(),
-                        'data': data.strip(),
-                        'hora': hora.strip(),
-                        'assento': assento.strip()
-                    }
-                    reservas.append(nova_linha)
+        with open(nome_arquivo, "r", encoding="utf-8") as arq:
+            linhas_arquivo = arq.readlines()
+    except:
+        print(f"\nArquivo '{nome_arquivo}' não encontrado!\n")
+        return
 
-        elif nome_arquivo == "reservasIncorretas.txt":
-            with open(nome_arquivo, "r", encoding='utf-8') as arq:
-                for linha in arq:
-                    cidade, hora, data, assento, erro = [campo.strip() for campo in linha.split(",")]
-                    nova_linha = {
-                        'cidade': cidade.strip(),
-                        'data': data.strip(),
-                        'hora': hora.strip(),
-                        'assento': assento.strip(),
-                        'erro': erro.strip()
-                    }
-                    reservas.append(nova_linha)
-        return reservas
-    except Exception as e:
-        print("Erro ao ler arquivo: ", e)
-        return None
+    print(f"\nLendo arquivo '{nome_arquivo}'...\n")
 
+    for linha in linhas_arquivo:
+        try:
+            partes = linha.split(",")
+
+            if len(partes) != 4:
+                print(f"Linha inválida (formato errado): {linha.strip()}")
+                gravar_reserva_invalida("5", cidade="??", hora="??", data="??/??/????", assento="??")
+                continue
+
+            cidade, hora, data, assento = [p.strip() for p in partes]
+
+            # Validar assento
+            try:
+                assento = int(assento)
+            except:
+                gravar_reserva_invalida("10", cidade, hora, data, assento="??")
+                print(f"Erro: Assento inválido → {linha.strip()}")
+                continue
+
+            linha_encontrada = None
+            for ln in linhas:
+                if ln and cidade.lower() in ln["destino"].lower():
+                    linha_encontrada = ln
+                    break
+
+            if not linha_encontrada:
+                gravar_reserva_invalida("1", cidade, hora, data, assento)
+                print(f"Erro: Nenhuma linha para → {cidade}")
+                continue
+
+            linha_id = linha_encontrada["id"]
+
+
+            onibus_escolhido = None
+            for onibus in onibus_por_linha[linha_id]:
+                if onibus["data"] == data:
+                    onibus_escolhido = onibus
+                    break
+
+            if onibus_escolhido is None:
+                gravar_reserva_invalida("3", cidade, hora, data, assento)
+                print(f"Erro: Data sem ônibus → {data}")
+                continue
+
+            valido = validar_onibus_data_hora(data[:5], hora)
+            if valido is False:
+                gravar_reserva_invalida("4", cidade, hora, data, assento)
+                print(f"Erro: Ônibus já passou → {data} {hora}")
+                continue
+
+
+            if not (1 <= assento <= 20):
+                gravar_reserva_invalida("10", cidade, hora, data, assento)
+                print(f"Erro: Número do assento inválido → {assento}")
+                continue
+
+            pos = assento - 1
+            if onibus_escolhido["assentos"][pos] is False:
+                gravar_reserva_invalida("7", cidade, hora, data, assento)
+                print(f"Erro: Assento já reservado → {assento}")
+                continue
+
+            onibus_escolhido["assentos"][pos] = False
+            #gravar_reservas_corretas(cidade, hora, data, assento)
+            print(f"Reserva OK: {cidade}, {hora}, {data}, assento {assento}")
+
+        except Exception as e:
+            print(f"Erro inesperado ao processar linha: {linha.strip()}")
+            gravar_reserva_invalida("Erro inesperado", cidade="??", data="??/??/????")
+            continue
+
+    print("\nImportação concluída!\n")
+def calcular_total_arrecadado():
+    """
+    Calcula o total arrecadado no mês atual para cada linha.
+    Considera que cada assento reservado (False) representa uma passagem vendida.
+    """
+
+    hoje = datetime.now()
+    mes_atual = hoje.month
+
+    resultados = []
+
+    for linha in linhas:
+        if linha is None:
+            continue
+
+        linha_id = linha["id"]
+        total = 0
+
+        for onibus in onibus_por_linha.get(linha_id, []):
+            data = datetime.strptime(onibus["data"], "%d/%m/%Y")
+
+            # só conta o mês atual
+            if data.month == mes_atual:
+                assentos_reservados = sum(1 for a in onibus["assentos"] if a is False)
+                total += assentos_reservados * linha["valor"]
+
+        resultados.append({
+            "linha_id": linha_id,
+            "origem": linha["origem"],
+            "destino": linha["destino"],
+            "total": total
+        })
+
+    return resultados
+
+
+def calcular_ocupacao_media():
+    """
+    Calcula a ocupação percentual média de cada linha por dia da semana.
+    
+    Retorna um dicionário:
+    { linha_id : [seg, ter, qua, qui, sex, sab, dom] }
+    """
+
+    ocupacao = {}
+
+    for linha in linhas:
+        if linha is None:
+            continue
+
+        linha_id = linha["id"]
+        matriz = [ [] for _ in range(7) ]  # 7 dias da semana
+
+        for onibus in onibus_por_linha.get(linha_id, []):
+            data = datetime.strptime(onibus["data"], "%d/%m/%Y")
+            dia_semana = data.weekday()  # 0=Seg ... 6=Dom
+
+            total_assentos = 20
+            reservados = sum(1 for a in onibus["assentos"] if a is False)
+
+            porcentagem = (reservados / total_assentos) * 100
+            matriz[dia_semana].append(porcentagem)
+
+        medias = []
+        for lista in matriz:
+            if lista:
+                medias.append(sum(lista) / len(lista))
+            else:
+                medias.append(0)
+
+        ocupacao[linha_id] = medias
+
+    return ocupacao
+
+
+
+
+def relatorio_total_arrecadado_arquivo(resultados):
+    nome = "relatorio_total_arrecadado.txt"
+
+    with open(nome, "w", encoding="utf-8") as arq:
+        arq.write("=== TOTAL ARRECADADO NO MÊS ATUAL ===\n\n")
+        for r in resultados:
+            arq.write(f"Linha {r['linha_id']} - {r['origem']} → {r['destino']}\n")
+            arq.write(f"Total arrecadado: R$ {r['total']:.2f}\n\n")
+
+    print(f"\nArquivo '{nome}' gerado com sucesso!\n")
+
+def grafico_total_arrecadado():
+    """Gera um gráfico de barras para o total arrecadado por linha."""
+    dados = calcular_total_arrecadado()
+
+    linhas_x = [f"L{d['linha_id']}" for d in dados]
+    valores_y = [d["total"] for d in dados]
+
+    plt.figure()
+    plt.bar(linhas_x, valores_y)
+    plt.title("Total Arrecadado por Linha (Mês Atual)")
+    plt.xlabel("Linha")
+    plt.ylabel("Total (R$)")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+
+def grafico_ocupacao_media():
+    """Gera um gráfico de linhas com a ocupação média por dia da semana."""
+    dados = calcular_ocupacao_media()
+
+    dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sab", "Dom"]
+
+    plt.figure()
+    for linha in linhas:
+        if linha is None:
+            continue
+
+        linha_id = linha["id"]
+        valores = dados.get(linha_id, [0]*7)
+
+        plt.plot(dias, valores, label=f"Linha {linha_id}")
+
+    plt.title("Ocupação Percentual Média por Linha e Dia da Semana")
+    plt.xlabel("Dia da Semana")
+    plt.ylabel("Ocupação (%)")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
 
 

@@ -161,7 +161,7 @@ def mostrar_onibus_da_linha(linha_id):
             cor = C.VERMELHO
 
         # Ex.: 16/11 (20)
-        linha += f"{cor}{data} ({livres}){C.RESET}".ljust(14)
+        linha += f"{cor}{data}({livres}){C.RESET} ".ljust(14)
         count += 1
 
         if count == 6:   # 6 datas por linha
@@ -238,7 +238,7 @@ def exibir_assentos(matriz_controle):
     print("Ímpares = Janela esquerda | Pares = Corredor \n")
 
 
-def exibir_arquivo(nome_arquivo, arquivo):
+'''def exibir_arquivo(nome_arquivo, arquivo):
     try:
         if nome_arquivo == "reservarCorretas.txt":
 
@@ -263,33 +263,120 @@ def exibir_arquivo(nome_arquivo, arquivo):
                 print(f"Hora: {hora}")
                 print(f"Assento: {assento}")
                 print("-" * 60)
-                
-        elif nome_arquivo == "reservasIncorretas.txt":
-            if not arquivo:
-                print("Nenhuma reserva encontrada.")
-                return
-            
-            print()
-            print("="*60)
-            print(f"{C.CIANO}{C.NEGRITO} LISTA DE RESERVAS INCORRETAS {C.RESET}")
-            print("="*60)
-            print()
-
-            for i, reserva in enumerate(arquivo):
-                cidade = reserva.get('cidade', '???')
-                data = reserva.get('data', '??/??/????')
-                hora = reserva.get('hora', '??:??')
-                assento = reserva.get('assento', '??')
-                erro = reserva.get('erro', '?')
-
-                print(f"Reserva {i+1}) {cidade}")
-                print(f"Data: {data}")
-                print(f"Hora: {hora}")
-                print(f"Assento: {assento}")
-                print(f"Erro: {erro.title()}")
-                print("-" * 60)
             
 
     except Exception as e:
-        print("Erro ao exibir arquivo: ", e)
+        print("Erro ao exibir arquivo: ", e)'''
+
+def relatorio_ocupacao_terminal(ocupacao):
+    print("\n=== OCUPAÇÃO MÉDIA POR DIA DA SEMANA ===\n")
+    dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sab", "Dom"]
+
+    for linha in e.linhas:
+        if linha is None:
+            continue
+
+        linha_id = linha["id"]
+        print(f"Linha {linha_id} - {linha['origem']} → {linha['destino']}")
+
+        valores = ocupacao.get(linha_id, [])
+
+        for i, v in enumerate(valores):
+            print(f"{dias[i]}: {v:.2f}%")
+
+        print()
+
+
+def relatorio_ocupacao_arquivo(ocupacao):
+    nome = "relatorio_ocupacao.txt"
+    dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sab", "Dom"]
+
+    with open(nome, "w", encoding="utf-8") as arq:
+        arq.write("=== OCUPAÇÃO MÉDIA POR DIA DA SEMANA ===\n\n")
+
+        for linha in e.linhas:
+            if linha is None:
+                continue
+
+            linha_id = linha["id"]
+            arq.write(f"Linha {linha_id} - {linha['origem']} → {linha['destino']}\n")
+
+            valores = ocupacao.get(linha_id, [])
+            for i, v in enumerate(valores):
+                arq.write(f"{dias[i]}: {v:.2f}%\n")
+
+            arq.write("\n")
+
+    print(f"\nArquivo '{nome}' gerado com sucesso!\n")
+
+def relatorio_total_arrecadado_terminal(resultados):
+    print("\n=== TOTAL ARRECADADO NO MÊS ATUAL ===\n")
+
+    for r in resultados:
+        print(f"Linha {r['linha_id']} - {r['origem']} → {r['destino']}")
+        print(f"Total arrecadado: R$ {r['total']:.2f}\n")
+
+def menu_relatorios():
+    print("\n=== RELATÓRIOS DO SISTEMA ===")
+    print("1 - Total arrecadado no mês atual")
+    print("2 - Ocupação percentual média por dia da semana")
+    print("0 - Voltar\n")
+
+    op = input("Escolha: ")
+
+    if op == "0":
+        return
+
+    print("\nComo deseja visualizar o relatório?")
+    print("1 - Terminal")
+    print("2 - Arquivo texto")
+    print("3 - Gráfico")
+    exibir = input("Escolha: ")
+
+
+    if op == "1":
+
+        resultados = e.calcular_total_arrecadado()
+        if resultados is None:
+            print("Nenhum dado de arrecadação disponível.")
+            return
+
+        if exibir == "1":
+            relatorio_total_arrecadado_terminal(resultados)
+
+        elif exibir == "2":
+            e.relatorio_total_arrecadado_arquivo(resultados)
+
+        elif exibir == "3":
+            e.grafico_total_arrecadado()
+
+        else:
+            print("Opção inválida!")
+
+        return  # ← evita cair no relatório 2
+
+    elif op == "2":
+
+        ocupacao = e.calcular_ocupacao_media()
+        if ocupacao is None:
+            print("Nenhum dado de ocupação disponível.")
+            return
+
+        if exibir == "1":
+            relatorio_ocupacao_terminal(ocupacao)
+
+        elif exibir == "2":
+            relatorio_ocupacao_arquivo(ocupacao)
+
+        elif exibir == "3":
+            e.grafico_ocupacao_media()
+
+        else:
+            print("Opção inválida!")
+
+        return
+
+    else:
+        print("Opção inválida!")
+
 

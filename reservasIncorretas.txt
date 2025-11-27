@@ -1,9 +1,0 @@
-Não Encontrada, ??:??, ??/??/????, ??, ID inválido para escolher a linha!
-Não Encontrada, ??:??, ??/??/????, ??, Este ônibus já passou!
-Bh, 9:00, 27/11/2025, 1, Este assento já está reservado!
-Bh, 9:00, 23/12/2025, ??, Nenhum assento reservado para esta data!
-Bh, ??:??, 2/12, ??, Nenhum ônibus disponível! Data inválida!
-Bh, ??:??, 5/12, ??, Nenhum ônibus disponível! Data inválida!
-Bh, ??:??, 26/12, ??, Nenhum ônibus disponível! Data inválida!
-Bh, ??:??, 1/12, ??, Nenhum ônibus disponível! Data inválida!
-Bh, 12:00, 02/12/2025, ??, Nenhum assento reservado para esta data!
