@@ -477,12 +477,16 @@ def mostrar_erros():
     opc = input("Escolha: ")
 
     if opc == "1":
+
+        # Mostra todos os erros no terminal
         print("\n=== ERROS REGISTRADOS ===\n")
         for e in erros_ocorridos:
             print(f"{e['cidade']}, {e['hora']}, {e['data']}, {e['assento']}, {e['erro']}")
         print()
 
     elif opc == "2":
+
+        # Salva erros em arquivo .txt
         nome = "relatorioErros.txt"
         try:
             with open(nome, "w", encoding="utf-8") as file:
@@ -517,6 +521,7 @@ def importar_reservas_arquivo():
                 gravar_reserva_invalida("5", cidade="??", hora="??", data="??/??/????", assento="??")
                 continue
 
+            # Remove espaços extras
             cidade, hora, data, assento = [p.strip() for p in partes]
 
             # Validar assento
@@ -527,6 +532,7 @@ def importar_reservas_arquivo():
                 print(f"Erro: Assento inválido → {linha.strip()}")
                 continue
 
+             # Procura linha de ônibus correspondente
             linha_encontrada = None
             for ln in linhas:
                 if ln and cidade.lower() in ln["destino"].lower():
@@ -540,7 +546,7 @@ def importar_reservas_arquivo():
 
             linha_id = linha_encontrada["id"]
 
-
+            # Procura ônibus com a mesma data
             onibus_escolhido = None
             for onibus in onibus_por_linha[linha_id]:
                 if onibus["data"] == data:
@@ -552,24 +558,27 @@ def importar_reservas_arquivo():
                 print(f"Erro: Data sem ônibus → {data}")
                 continue
 
+            # Confere se a viagem já passou
             valido = validar_onibus_data_hora(data[:5], hora)
             if valido is False:
                 gravar_reserva_invalida("4", cidade, hora, data, assento)
                 print(f"Erro: Ônibus já passou → {data} {hora}")
                 continue
 
-
+            # Checa validade do número do assento
             if not (1 <= assento <= 20):
                 gravar_reserva_invalida("10", cidade, hora, data, assento)
                 print(f"Erro: Número do assento inválido → {assento}")
                 continue
 
+            # Verifica se o assento já está ocupado
             pos = assento - 1
             if onibus_escolhido["assentos"][pos] is False:
                 gravar_reserva_invalida("7", cidade, hora, data, assento)
                 print(f"Erro: Assento já reservado → {assento}")
                 continue
 
+            # Reserva o assento
             onibus_escolhido["assentos"][pos] = False
             #gravar_reservas_corretas(cidade, hora, data, assento)
             print(f"Reserva OK: {cidade}, {hora}, {data}, assento {assento}")
@@ -580,6 +589,7 @@ def importar_reservas_arquivo():
             continue
 
     print("\nImportação concluída!\n")
+
 def calcular_total_arrecadado():
     """
     Calcula o total arrecadado no mês atual para cada linha.
@@ -641,9 +651,9 @@ def calcular_ocupacao_media():
             reservados = sum(1 for a in onibus["assentos"] if a is False)
 
             porcentagem = (reservados / total_assentos) * 100
-            matriz[dia_semana].append(porcentagem)
+            matriz[dia_semana].append(porcentagem) # Guarda percentuais para cada dia
 
-        medias = []
+        medias = [] # média de ocupação para cada dia
         for lista in matriz:
             if lista:
                 medias.append(sum(lista) / len(lista))
@@ -658,6 +668,8 @@ def calcular_ocupacao_media():
 
 
 def relatorio_total_arrecadado_arquivo(resultados):
+    """Gera arquivo com os totais arrecadados"""
+    
     nome = "relatorio_total_arrecadado.txt"
 
     with open(nome, "w", encoding="utf-8") as arq:

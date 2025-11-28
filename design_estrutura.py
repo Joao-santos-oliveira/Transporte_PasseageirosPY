@@ -269,6 +269,8 @@ def exibir_assentos(matriz_controle):
         print("Erro ao exibir arquivo: ", e)'''
 
 def relatorio_ocupacao_terminal(ocupacao):
+    """Mostra no terminal a ocupação média de cada linha por dia da semana"""
+
     print("\n=== OCUPAÇÃO MÉDIA POR DIA DA SEMANA ===\n")
     dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sab", "Dom"]
 
@@ -279,7 +281,7 @@ def relatorio_ocupacao_terminal(ocupacao):
         linha_id = linha["id"]
         print(f"Linha {linha_id} - {linha['origem']} → {linha['destino']}")
 
-        valores = ocupacao.get(linha_id, [])
+        valores = ocupacao.get(linha_id, []) # pega os percentuais de ocupação
 
         for i, v in enumerate(valores):
             print(f"{dias[i]}: {v:.2f}%")
@@ -288,6 +290,8 @@ def relatorio_ocupacao_terminal(ocupacao):
 
 
 def relatorio_ocupacao_arquivo(ocupacao):
+    """arquivo de texto com a ocupação média"""
+
     nome = "relatorio_ocupacao.txt"
     dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sab", "Dom"]
 
@@ -310,6 +314,8 @@ def relatorio_ocupacao_arquivo(ocupacao):
     print(f"\nArquivo '{nome}' gerado com sucesso!\n")
 
 def relatorio_total_arrecadado_terminal(resultados):
+    """mostra no terminal o total arrecadado por linha no mês atual"""
+
     print("\n=== TOTAL ARRECADADO NO MÊS ATUAL ===\n")
 
     for r in resultados:
@@ -317,6 +323,7 @@ def relatorio_total_arrecadado_terminal(resultados):
         print(f"Total arrecadado: R$ {r['total']:.2f}\n")
 
 def menu_relatorios():
+    
     print("\n=== RELATÓRIOS DO SISTEMA ===")
     print("1 - Total arrecadado no mês atual")
     print("2 - Ocupação percentual média por dia da semana")
