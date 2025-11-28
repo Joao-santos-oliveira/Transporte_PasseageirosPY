@@ -4,6 +4,8 @@ import auxilares as a
 from desing_terminal import Cores as C
 
 def menu():
+    """Exibição do menu principal"""
+    
     while True:
         print("\n" + C.AZUL_CLARO + C.NEGRITO + "="*60 + C.RESET)
         print(f"{C.VERDE_CLARO}{C.NEGRITO}     SISTEMA DE VENDA DE PASSAGENS – MENU PRINCIPAL{C.RESET}")

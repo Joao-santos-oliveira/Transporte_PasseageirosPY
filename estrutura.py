@@ -2,6 +2,7 @@ import design_estrutura as d
 from datetime import datetime, timedelta
 import numpy as np
 import matplotlib.pyplot as plt
+from desing_terminal import Cores as C
 
 
 linhas = []               # lista de linhas cadastradas
@@ -18,17 +19,79 @@ def gerar_assentos():
     return [True for _ in range(20)]
 
 
-#FUNÇAO PARA INSERIR LINHA DE ONIBUS
+#FUNÇAO PARA INSERIR LINHA DE ONIBUS ********************************************************************************************
  
 def inserir_linha():
     """Insere uma nova linha no sistema."""
-
-    print("\n=== CADASTRO DE NOVA LINHA ===")
     
-    origem = input("Cidade de origem: ")
-    destino = input("Cidade de destino: ")
-    horario = input("Horário (hh:mm): ")
-    valor = float(input("Valor da passagem: "))
+    print("\n=== CADASTRO DE NOVA LINHA ===")
+
+    while True:
+
+        origem = input("Cidade de origem: ").strip()
+        if not origem:
+            print(f"{C.VERMELHO}Origem inválida, favor inserir um local.{C.RESET}\n")
+            continue
+        break
+
+    while True:
+        destino = input("Cidade de destino: ").strip()
+        if not destino:
+            print(f"{C.VERMELHO}Destino inválido, favor inserir um local.{C.RESET}\n")
+            continue
+        break
+
+    while True:
+        horario = input("Horário (hh:mm): ").strip()
+
+        if not horario or ":" not in horario:
+            print(f"{C.VERMELHO}Horário inválido, digite hh:mm.{C.RESET}\n")
+            continue
+
+        horario_separado = horario.split(":")
+
+        if len(horario_separado) != 2:
+            print(f"{C.VERMELHO}Hora inválida, digite no formato hh:mm.{C.RESET}\n")
+            continue
+
+        try:
+            hora = int(horario_separado[0])
+            minuto = int(horario_separado[1])
+
+            if hora < 0 or hora > 23:
+                print(f"{C.VERMELHO}Hora inválida, digite um número entre 0 e 23.{C.RESET}\n")
+                continue
+
+            if minuto < 0 or minuto > 59:
+                print(f"{C.VERMELHO}Minuto inválido, digite um número entre 0 e 59.{C.RESET}\n")
+                continue
+
+        except ValueError:
+            print(f"{C.VERMELHO}Valor inválido, digite apenas números.{C.RESET}\n")
+            continue
+
+        break
+        
+    while True:
+        try:
+            valor = input("Valor da passagem: ").strip().replace(",", ".")
+           
+            if valor == "":
+                print(f"{C.VERMELHO}Valor inválido, não pode ser vazio.{C.RESET}\n")
+                continue
+
+            valor = float(valor)
+
+            if valor <= 0:
+                print(f"{C.VERMELHO}Valor inválido, não permitido números negativos.{C.RESET}\n")
+                continue
+
+        except Exception:
+            print(f"{C.VERMELHO}Valor inválido, digite apenas números.{C.RESET}\n")
+            continue
+
+        break
+        
 
     linha_id = len(linhas)  # ID automático baseado na quantidade de linhas já cadastradas
 
@@ -83,6 +146,7 @@ def cadastrar_linha_completa():
 
 def remover_linha():
     """Remove uma linha pelo ID e apaga seus ônibus."""
+
     print("\n=== REMOVER LINHA ===")
 
     if not linhas:
@@ -112,6 +176,7 @@ def remover_linha():
 
 def alterar_linha():
     """Permite editar origem, destino, horário e valor de uma linha já cadastrada."""
+
     print("\n=== ALTERAR LINHA ===")
 
     if not linhas:
@@ -171,6 +236,7 @@ def alterar_linha():
 
 def consultar_horarios_por_cidade():
     """Mostra todas as linhas que partem ou chegam em determinada cidade."""
+
     print("\n=== CONSULTAR HORÁRIOS POR CIDADE ===")
 
     cidade = input("Digite o nome da cidade: ").strip()
@@ -194,6 +260,8 @@ def consultar_horarios_por_cidade():
 #   VALIDAR ÔNIBUS BASEADO NA HORÁRIO E DATA
 
 def validar_onibus_data_hora(data, hora):
+    """Verifica se o ônibus está na rota atual"""
+
     try:
     
         dia, mes = map(int, data.split("/"))
@@ -216,10 +284,11 @@ def validar_onibus_data_hora(data, hora):
     except ValueError:
         return None
     
-#   CONSULTAR ASSENTOS
+#   CONSULTAR ASSENTOS ***************************************************************************************
 
-def consultar_assentos():
+def consultar_assentos(): 
     """Mostra todos os assentos disponpiveis para reserva ou para cancelamento"""
+
     print("\n=== CONSULTAR ASSENTOS ===")
 
     cidade = input("Digite o nome da cidade de destino: ").strip()
@@ -395,40 +464,17 @@ def consultar_assentos():
         print("Opção inválida.")
         return
 
-#   ARQUIVO COM RESERVAS CORRETAS
 
-'''def gravar_reservas_corretas(cidade, hora, data, assento):
-    nome_arquivo = "reservarCorretas.txt"
-    try:
-        with open(nome_arquivo, "a", encoding='utf-8') as arq:
-            mensagem = f"{cidade.title()}, {hora}, {data}, {assento}\n"
-            arq.write(mensagem)
-    except Exception as e:
-        print(f"Erro ao gravar reserva no arquivo: {e}")
+#   ARQUIVO RESERVAS INVÁLIDAS *********************************************************************************
 
-def excluir_reserva_arquivo(cidade, hora, data, assento):
-    nome_arquivo = "reservarCorretas.txt"
-    mensagem = f"{cidade.title()}, {hora}, {data}, {assento}".lower().strip()
-
-    try:
-        with open(nome_arquivo, "r", encoding='utf-8') as arq:
-            linhas = arq.readlines()
-
-        with open(nome_arquivo, "w", encoding='utf-8') as arq:
-            for linha in linhas:
-                if linha.strip().lower() != mensagem:
-                    arq.write(linha)
-
-    except Exception as e:
-        print(f"Erro ao apagar reserva no arquivo: {e}")'''
-
-#   ARQUIVO RESERVAS INVÁLIDAS
 def gravar_reserva_invalida(erro='Erro inesperado ao realizar reserva!', cidade="Não encontrada", hora='??:??', data='??/??/????', assento='??'):
+    """Gravar as reservas inválidas no arquivo .txt"""
 
     global erros_ocorridos
 
     nome_arquivo = "relatorioErros.txt"
 
+    # Mapeamento de erros
     erros_map = {
         "1": "Nenhuma linha encontrada para essa cidade.",
         "2": "ID inválido para escolher a linha!",
@@ -464,7 +510,11 @@ def gravar_reserva_invalida(erro='Erro inesperado ao realizar reserva!', cidade=
     except:
         print("Erro ao gravar erro no arquivo.")
         
+#   MOSTRAR ERROS
+
 def mostrar_erros():
+    """Exibir as reservas inválidas gravadas no arquivo .txt"""
+
     global erros_ocorridos
 
     if not erros_ocorridos:
@@ -499,7 +549,12 @@ def mostrar_erros():
     else:
         print("Opção inválida.")
 
+
+#   IMPORTAR RESERVAS DO ARQUIVO ************************************************************************************
+
 def importar_reservas_arquivo():
+    """Importar as reservas de um arquivo .txt"""
+
     print("\n=== IMPORTAR RESERVAS DE ARQUIVO ===")
     nome_arquivo = input("Digite o nome do arquivo (ex: reservas.txt): ").strip()
 
@@ -590,6 +645,8 @@ def importar_reservas_arquivo():
 
     print("\nImportação concluída!\n")
 
+#       CALCULAR O TOTAL ARRECADADO *****************************************
+
 def calcular_total_arrecadado():
     """
     Calcula o total arrecadado no mês atual para cada linha.
@@ -625,6 +682,7 @@ def calcular_total_arrecadado():
 
     return resultados
 
+#       CALCULAR A OCUPAÇÃO MÉDIA DE CADA LINHA ********************************************************
 
 def calcular_ocupacao_media():
     """
@@ -664,12 +722,11 @@ def calcular_ocupacao_media():
 
     return ocupacao
 
-
-
+#       GERAR ARQUIVO PARA RELATÓRIO DO TOTAL ARRECADADO
 
 def relatorio_total_arrecadado_arquivo(resultados):
     """Gera arquivo com os totais arrecadados"""
-    
+
     nome = "relatorio_total_arrecadado.txt"
 
     with open(nome, "w", encoding="utf-8") as arq:
@@ -680,8 +737,11 @@ def relatorio_total_arrecadado_arquivo(resultados):
 
     print(f"\nArquivo '{nome}' gerado com sucesso!\n")
 
+#       GERAR GRÁFICO DO TOTAL ARRECADADO
+
 def grafico_total_arrecadado():
     """Gera um gráfico de barras para o total arrecadado por linha."""
+
     dados = calcular_total_arrecadado()
 
     linhas_x = [f"L{d['linha_id']}" for d in dados]
@@ -696,6 +756,7 @@ def grafico_total_arrecadado():
     plt.tight_layout()
     plt.show()
 
+#       GERAR GRÁFICO DA OCUPAÇÃO MÉDIA
 
 def grafico_ocupacao_media():
     """Gera um gráfico de linhas com a ocupação média por dia da semana."""

@@ -5,6 +5,8 @@ import numpy as np
 
 
 def exibir_linha(linha_id, linha):
+    """Exibe uma linha específica, assim que é criada"""
+
     print("\n" + "="*50)
     print("✔️  Linha cadastrada com sucesso!")
     print("="*50)
@@ -21,6 +23,8 @@ def exibir_linha(linha_id, linha):
 
 
 def exibir_linha_formatada(linha_id, linha):
+    """Exibe uma linha específica, utilizando o id"""
+
     print("\n" + "="*50)
     print("🚌  Detalhes da Linha")
     print("\n" + "="*50)
@@ -63,6 +67,7 @@ def mostrar_linhas():
 
 def mostrar_horario_onibus(linha_id, onibus_escolhido):
     """Exibe o horário do ônibus da linha escolhida em formato de calendário, mostrando assentos livres."""
+
     if linha_id < 0 or linha_id >= len(e.linhas):
         print(f"{C.VERMELHO}ID inexistente!{C.RESET}\n")
         return
@@ -122,6 +127,7 @@ def mostrar_horario_onibus(linha_id, onibus_escolhido):
 
 def mostrar_onibus_da_linha(linha_id):
     """Exibe os ônibus da linha em formato de calendário, mostrando assentos livres."""
+
     if linha_id < 0 or linha_id >= len(e.linhas):
         print(f"{C.VERMELHO}ID inexistente!{C.RESET}\n")
         return
@@ -238,36 +244,6 @@ def exibir_assentos(matriz_controle):
     print("Ímpares = Janela esquerda | Pares = Corredor \n")
 
 
-'''def exibir_arquivo(nome_arquivo, arquivo):
-    try:
-        if nome_arquivo == "reservarCorretas.txt":
-
-            if not arquivo:
-                print("Nenhuma reserva encontrada.")
-                return
-            
-            print()
-            print("="*60)
-            print(f"{C.CIANO}{C.NEGRITO} LISTA DE RESERVAS {C.RESET}")
-            print("="*60)
-            print()
-
-            for i, reserva in enumerate(arquivo):
-                cidade = reserva.get('cidade', '???')
-                data = reserva.get('data', '??/??/????')
-                hora = reserva.get('hora', '??:??')
-                assento = reserva.get('assento', '??')
-
-                print(f"Reserva {i+1}) {cidade}")
-                print(f"Data: {data}")
-                print(f"Hora: {hora}")
-                print(f"Assento: {assento}")
-                print("-" * 60)
-            
-
-    except Exception as e:
-        print("Erro ao exibir arquivo: ", e)'''
-
 def relatorio_ocupacao_terminal(ocupacao):
     """Mostra no terminal a ocupação média de cada linha por dia da semana"""
 
@@ -290,7 +266,7 @@ def relatorio_ocupacao_terminal(ocupacao):
 
 
 def relatorio_ocupacao_arquivo(ocupacao):
-    """arquivo de texto com a ocupação média"""
+    """Arquivo de texto com a ocupação média"""
 
     nome = "relatorio_ocupacao.txt"
     dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sab", "Dom"]
@@ -314,7 +290,7 @@ def relatorio_ocupacao_arquivo(ocupacao):
     print(f"\nArquivo '{nome}' gerado com sucesso!\n")
 
 def relatorio_total_arrecadado_terminal(resultados):
-    """mostra no terminal o total arrecadado por linha no mês atual"""
+    """Mostra no terminal o total arrecadado por linha no mês atual"""
 
     print("\n=== TOTAL ARRECADADO NO MÊS ATUAL ===\n")
 
@@ -323,7 +299,8 @@ def relatorio_total_arrecadado_terminal(resultados):
         print(f"Total arrecadado: R$ {r['total']:.2f}\n")
 
 def menu_relatorios():
-    
+    """Mostra o menu dos relatórios"""
+
     print("\n=== RELATÓRIOS DO SISTEMA ===")
     print("1 - Total arrecadado no mês atual")
     print("2 - Ocupação percentual média por dia da semana")
