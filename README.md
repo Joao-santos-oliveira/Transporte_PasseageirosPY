@@ -56,7 +56,7 @@ O programa é executado no **terminal**, logo tem apenas a interface da linha de
 <img width="393" height="320" alt="image" src="https://github.com/user-attachments/assets/d2acf9f1-ef52-4d9e-b949-2c6085500c04" />
 
 ### Remover  Linha (opção 02):
-<img width="339" height="106" alt="image" src="https://github.com/user-attachments/assets/75956ee2-6782-49e8-b28c-b1271f644b40" />;
+<img width="339" height="106" alt="image" src="https://github.com/user-attachments/assets/75956ee2-6782-49e8-b28c-b1271f644b40" />
 
 ### Editar Linha (opção 03):
 <img width="426" height="447" alt="image" src="https://github.com/user-attachments/assets/73cbfa43-2669-4f6a-b8e4-149713ea9090" />
