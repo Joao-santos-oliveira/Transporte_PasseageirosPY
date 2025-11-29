@@ -207,20 +207,73 @@ def alterar_linha():
     op = input("Escolha: ")
 
     if op == "1":
-        linha["origem"] = input("Nova cidade de origem: ")
+        while True:
+            linha["origem"] = input("Nova cidade de origem: ").strip()
+            if not linha["origem"]:
+                print(f"{C.VERMELHO}Origem inválida, favor inserir um local.{C.RESET}\n")
+                continue
+            break
 
     elif op == "2":
-        linha["destino"] = input("Nova cidade de destino: ")
+        while True:
+            linha["destino"] = input("Nova cidade de destino: ").strip()
+            if not linha["destino"]:
+                print(f"{C.VERMELHO}Destino inválido, favor inserir um local.{C.RESET}\n")
+                continue
+            break
 
     elif op == "3":
-        linha["horario"] = input("Novo horário (hh:mm): ")
+        while True:
+            linha["horario"] = input("Novo horário (hh:mm): ").strip()
+
+            if not linha["horario"] or ":" not in linha["horario"]:
+                print(f"{C.VERMELHO}Horário inválido, digite hh:mm.{C.RESET}\n")
+                continue
+
+            horario_separado = linha["horario"].split(":")
+
+            if len(horario_separado) != 2:
+                print(f"{C.VERMELHO}Hora inválida, digite no formato hh:mm.{C.RESET}\n")
+                continue
+
+            try:
+                hora = int(horario_separado[0])
+                minuto = int(horario_separado[1])
+
+                if hora < 0 or hora > 23:
+                    print(f"{C.VERMELHO}Hora inválida, digite um número entre 0 e 23.{C.RESET}\n")
+                    continue
+
+                if minuto < 0 or minuto > 59:
+                    print(f"{C.VERMELHO}Minuto inválido, digite um número entre 0 e 59.{C.RESET}\n")
+                    continue
+
+            except ValueError:
+                print(f"{C.VERMELHO}Valor inválido, digite apenas números.{C.RESET}\n")
+                continue
+
+            break
 
     elif op == "4":
-        try:
-            linha["valor"] = float(input("Novo valor da passagem: "))
-        except:
-            print("Valor inválido.")
-            return
+        while True:
+            try:
+                linha["valor"] = input("Novo valor da passagem: ").strip().replace(",", ".")
+           
+                if linha["valor"] == "":
+                    print(f"{C.VERMELHO}Valor inválido, não pode ser vazio.{C.RESET}\n")
+                    continue
+
+                linha["valor"] = float(linha["valor"])
+
+                if linha["valor"] <= 0:
+                    print(f"{C.VERMELHO}Valor inválido, não permitido números negativos.{C.RESET}\n")
+                    continue
+
+            except Exception:
+                print(f"{C.VERMELHO}Valor inválido, digite apenas números.{C.RESET}\n")
+                continue
+
+            break
 
     elif op == "0":
         print("Edição cancelada.")
@@ -766,18 +819,22 @@ def grafico_ocupacao_media():
 
     plt.figure()
     for linha in linhas:
-        if linha is None:
-            continue
+            if linha is None:
+                #linha_id = " ainda não cadastrada."
+                continue
 
-        linha_id = linha["id"]
-        valores = dados.get(linha_id, [0]*7)
+            linha_id = linha["id"]
+            valores = dados.get(linha_id, [0]*7)
 
-        plt.plot(dias, valores, label=f"Linha {linha_id}")
+            plt.plot(dias, valores, label=f"Linha {linha_id}")
+
+    
 
     plt.title("Ocupação Percentual Média por Linha e Dia da Semana")
     plt.xlabel("Dia da Semana")
     plt.ylabel("Ocupação (%)")
-    plt.legend()
+    if plt.gca().lines:
+        plt.legend()
     plt.tight_layout()
     plt.show()
 
